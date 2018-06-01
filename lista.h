@@ -26,6 +26,7 @@ public:
 	void pop_top();
 	void pop_back();
 	void pop_at(const int&);
+	void clear();
 	T& operator[](const int&);
 	const T& zwrot(const int&) const;
 };
@@ -153,6 +154,15 @@ void lista<T>::pop_at(const int& n)
 			pom->nastepnik->poprzednik=pom->poprzednik;
 			delete pom;
 		}
+	}
+}
+
+template<class T>
+void lista<T>::clear()
+{
+	while(pierwszy)
+	{
+		pop_top();
 	}
 }
 

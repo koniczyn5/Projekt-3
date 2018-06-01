@@ -16,9 +16,11 @@ debug: szkola_bin
 szkola_bin: $(OBJS)
 	$(CXX) $(LDFLAGS)  $(OBJS) -o szkola_bin  $(LDLIBS) 
 
-main.o: main.cpp szkola.h
+main.o: main.cpp szkola.h lista.h interfejs.cpp
 
 szkola.o: szkola.cpp szkola.h
+
+lista.o: lista.h
 
 clean:
 	$(RM) $(OBJS)
