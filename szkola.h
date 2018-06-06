@@ -33,6 +33,7 @@ public:
 	sala& operator=(const sala&) = default;
 	~sala(){};
 	std::string zwrocSymbol() const;
+	bool zwrocDostepnosc(int, int) const;
 	void zmienDostepnosc(int, int, bool = 0);
 	std::stringstream save();
 	friend std::ostream& operator<<(std::ostream&, const sala&);

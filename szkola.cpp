@@ -94,6 +94,11 @@ sala::sala(const std::string& s) : symbol(s){}
 std::string sala::zwrocSymbol() const
 {return symbol;}
 
+bool sala::zwrocDostepnosc(int a, int b) const
+{
+	return dostepnosc.tab[a][b];
+}
+
 void sala::zmienDostepnosc(int a, int b, bool data)
 {
 	if (data)
@@ -435,7 +440,7 @@ std::ostream& operator<<(std::ostream& out, const uczen& u)
 	return out;
 }
 
-zajecia::zajecia(const std::string& k) : symbolKlasy(k) {}
+zajecia::zajecia(const std::string& k) : symbolKlasy(k), s(nullptr), n(nullptr) {}
 
 std::string zajecia::zwrocSale() const
 {return s->zwrocSymbol();}
@@ -468,7 +473,11 @@ std::stringstream zajecia::save()
 
 std::ostream& operator<<(std::ostream& out, const zajecia& z)
 {
-	if (!z.s || !z.n) throw std::string("Niekompletne zajecia");
+	if (!z.s || !z.n)
+	{
+		out<<"Brak zajec\n";
+		return out;
+	}
 	out << "Przedmiot: " << z.wskazNauczyciela()->zwrocPrzedmiot();
 	out << " Sala: " << z.zwrocSale();
 	out << " Nauczyciel: " << z.wskazNauczyciela()->zwrocNazwisko()<<" "<<z.wskazNauczyciela()->zwrocImie();
@@ -497,7 +506,11 @@ zajecia* planLekcji::wskazZajecia(int d, int g)
 void planLekcji::zmienZajecia(int d, int g, zajecia* z)
 {
 	if (z == rozklad.wskazObiekt(d, g)) throw std::string("Te zajecia sa juz wpisane w tym miejscu");
-	if (z)	rozklad.tab[d][g] = *z;
+	if (z)	
+	{
+		zajecia pom=*z;
+		rozklad.tab[d][g] = pom;
+	}
 	else rozklad.tab[d][g]= zajecia(k->zwrocSymbol());
 }
 

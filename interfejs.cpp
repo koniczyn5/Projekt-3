@@ -1,6 +1,6 @@
 #include<string>
 #include<ctime>
-#include<algorithm>
+#include<cstdlib>
 #include<iostream>
 #include<fstream>
 #include<sstream>
@@ -368,9 +368,549 @@ void submenu_sale(std::istream& in, std::ostream& out, lista<sala>& sale, bool& 
 	}
 }
 
+nauczyciel* znajdz_nauczyciela(std::string przedmiot, lista<nauczyciel>& nauczyciele, lista<wychowawca>& wychowawcy)
+{
+	bool failure=1;
+	int los=rand()%15;
+	while(true)
+	{
+		for(int i=1; i<=nauczyciele.length(); i++)
+		{
+			if(przedmiot==nauczyciele[i].zwrocPrzedmiot())
+			{
+				failure=0;
+				if(los==0)
+				{
+					return &nauczyciele[i];
+				}
+				los--;
+			}
+		}
+		for(int i=1; i<=wychowawcy.length(); i++)
+		{
+			if(przedmiot==wychowawcy[i].zwrocPrzedmiot())
+			{
+				failure=0;
+				if(los==0)
+				{
+					return &wychowawcy[i];
+				}
+				los--;
+			}
+		}
+		if(failure)
+		{
+			return nullptr;
+		}
+	}
+}
+
+sala* znajdz_sale(int d, int g, lista<sala>& sale)
+{
+	int los=rand()%sale.length()+1;
+	if(sale[los].zwrocDostepnosc(d,g)==0)
+	{
+		return &sale[los];
+	}
+	else
+	{
+		for(int i=1; i<=sale.length(); i++)
+		{
+			if(sale[i].zwrocDostepnosc(d,g)==0)
+			{
+				return &sale[i];
+			}
+		}
+	}
+	return nullptr;
+}
+
+void wyczysc_sale(planLekcji& plan, lista<sala>& sale)
+{
+	for(int d=0; d<5; d++)
+	{
+		for(int g=0; g<9; g++)
+		{
+			if(plan.wskazZajecia(d,g)->wskazSale())
+			{
+				plan.wskazZajecia(d,g)->wskazSale()->zmienDostepnosc(d,g);
+			}
+		}
+	}
+}
+
+void utworz_plan(std::ostream& out, klasa& klas, bool& changes, lista<planLekcji>& plany, lista<sala>& sale, lista<nauczyciel>& nauczyciele, lista<wychowawca>& wychowawcy)
+{
+	planLekcji temp(&klas);
+	int los, los1, los2;
+	nauczyciel* n;
+	sala* s;
+	//matematyka 4 lekcje w tygodniu
+	{
+		bool failure=1;
+		n=znajdz_nauczyciela(std::string("matematyka"), nauczyciele, wychowawcy);
+		if(n==nullptr)
+		{
+			wyczysc_sale(temp, sale);
+			out<<"Nie znaleziono wolnego nauczyciela matematyki\n";
+			return;
+		}
+		los=rand()%5;
+		for(int i=0; i<5; i++)
+		{
+			if(i==los) continue;
+			for(int j=0; j<9; j++)
+			{
+				if(temp.wskazZajecia(i,j)->wskazSale())
+				{
+					continue;
+				}
+				s=znajdz_sale(i, j, sale);
+				if(s)
+				{
+					failure=0;
+					zajecia pom(klas.zwrocSymbol());
+					pom.zmienSale(s);
+					s->zmienDostepnosc(i,j,1);
+					pom.zmienNauczyciela(n);
+					temp.zmienZajecia(i,j,&pom);
+					break;
+				}
+				
+			}
+			if(failure)
+			{
+				wyczysc_sale(temp, sale);
+				out<<"Nie znaleziono wolnej sali\n";
+				return;
+			}
+		}
+	}
+	//polski 4 lekcje w tygodniu
+	{
+		bool failure=1;
+		n=znajdz_nauczyciela(std::string("polski"), nauczyciele, wychowawcy);
+		if(n==nullptr)
+		{
+			wyczysc_sale(temp, sale);
+			out<<"Nie znaleziono wolnego nauczyciela jezyka polskiego\n";
+			return;
+		}
+		los=rand()%5;
+		for(int i=0; i<5; i++)
+		{
+			if(i==los) continue;
+			for(int j=0; j<9; j++)
+			{
+				if(temp.wskazZajecia(i,j)->wskazSale())
+				{
+					continue;
+				}
+				s=znajdz_sale(i, j, sale);
+				if(s)
+				{
+					failure=0;
+					zajecia pom(klas.zwrocSymbol());
+					pom.zmienSale(s);
+					s->zmienDostepnosc(i,j,1);
+					pom.zmienNauczyciela(n);
+					temp.zmienZajecia(i,j,&pom);
+					break;
+				}
+			}
+			if(failure)
+			{
+				wyczysc_sale(temp, sale);
+				out<<"Nie znaleziono wolnej sali\n";
+				return;
+			}
+		}
+	}
+	//angielski 4 lekcje w tygodniu
+	{
+		bool failure=1;
+		n=znajdz_nauczyciela(std::string("angielski"), nauczyciele, wychowawcy);
+		if(n==nullptr)
+		{
+			wyczysc_sale(temp, sale);
+			out<<"Nie znaleziono wolnego nauczyciela jezyka angielskiego\n";
+			return;
+		}
+		los=rand()%5;
+		for(int i=0; i<5; i++)
+		{
+			if(i==los) continue;
+			for(int j=0; j<9; j++)
+			{
+				if(temp.wskazZajecia(i,j)->wskazSale())
+				{
+					continue;
+				}
+				s=znajdz_sale(i, j, sale);
+				if(s)
+				{
+					failure=0;
+					zajecia pom(klas.zwrocSymbol());
+					pom.zmienSale(s);
+					s->zmienDostepnosc(i,j,1);
+					pom.zmienNauczyciela(n);
+					temp.zmienZajecia(i,j,&pom);
+					break;
+				}
+			}
+			if(failure)
+			{
+				wyczysc_sale(temp, sale);
+				out<<"Nie znaleziono wolnej sali\n";
+				return;
+			}
+		}
+	}
+	//fizyka 2 lekcje w tygodniu
+	{
+		bool failure=1;
+		n=znajdz_nauczyciela(std::string("fizyka"), nauczyciele, wychowawcy);
+		if(n==nullptr)
+		{
+			wyczysc_sale(temp, sale);
+			out<<"Nie znaleziono wolnego nauczyciela fizyki\n";
+			return;
+		}
+		los1=rand()%5;
+		los2=rand()%5;
+		while(los1==los2)
+		{
+			los2=rand()%5;
+		}
+		for(int i=0; i<5; i++)
+		{
+			if(i!=los1 && i!=los2) continue;
+			for(int j=0; j<9; j++)
+			{
+				if(temp.wskazZajecia(i,j)->wskazSale())
+				{
+					continue;
+				}
+				s=znajdz_sale(i, j, sale);
+				if(s)
+				{
+					failure=0;
+					zajecia pom(klas.zwrocSymbol());
+					pom.zmienSale(s);
+					s->zmienDostepnosc(i,j,1);
+					pom.zmienNauczyciela(n);
+					temp.zmienZajecia(i,j,&pom);
+					break;
+				}
+			}
+			if(failure)
+			{
+				wyczysc_sale(temp, sale);
+				out<<"Nie znaleziono wolnej sali\n";
+				return;
+			}
+		}
+	}
+	//chemia 2 lekcje w tygodniu
+	{
+		bool failure=1;
+		n=znajdz_nauczyciela(std::string("chemia"), nauczyciele, wychowawcy);
+		if(n==nullptr)
+		{
+			wyczysc_sale(temp, sale);
+			out<<"Nie znaleziono wolnego nauczyciela chemii\n";
+			return;
+		}
+		los1=rand()%5;
+		los2=rand()%5;
+		while(los1==los2)
+		{
+			los2=rand()%5;
+		}
+		for(int i=0; i<5; i++)
+		{
+			if(i!=los1 && i!=los2) continue;
+			for(int j=0; j<9; j++)
+			{
+				if(temp.wskazZajecia(i,j)->wskazSale())
+				{
+					continue;
+				}
+				s=znajdz_sale(i, j, sale);
+				if(s)
+				{
+					failure=0;
+					zajecia pom(klas.zwrocSymbol());
+					pom.zmienSale(s);
+					s->zmienDostepnosc(i,j,1);
+					pom.zmienNauczyciela(n);
+					temp.zmienZajecia(i,j,&pom);
+					break;
+				}
+			}
+			if(failure)
+			{
+				wyczysc_sale(temp, sale);
+				out<<"Nie znaleziono wolnej sali\n";
+				return;
+			}
+		}
+	}
+	//biologia 2 lekcje w tygodniu
+	{
+		bool failure=1;
+		n=znajdz_nauczyciela(std::string("biologia"), nauczyciele, wychowawcy);
+		if(n==nullptr)
+		{
+			wyczysc_sale(temp, sale);
+			out<<"Nie znaleziono wolnego nauczyciela biologii\n";
+			return;
+		}
+		los1=rand()%5;
+		los2=rand()%5;
+		while(los1==los2)
+		{
+			los2=rand()%5;
+		}
+		for(int i=0; i<5; i++)
+		{
+			if(i!=los1 && i!=los2) continue;
+			for(int j=0; j<9; j++)
+			{
+				if(temp.wskazZajecia(i,j)->wskazSale())
+				{
+					continue;
+				}
+				s=znajdz_sale(i, j, sale);
+				if(s)
+				{
+					failure=0;
+					zajecia pom(klas.zwrocSymbol());
+					pom.zmienSale(s);
+					s->zmienDostepnosc(i,j,1);
+					pom.zmienNauczyciela(n);
+					temp.zmienZajecia(i,j,&pom);
+					break;
+				}
+			}
+			if(failure)
+			{
+				wyczysc_sale(temp, sale);
+				out<<"Nie znaleziono wolnej sali\n";
+				return;
+			}
+		}
+	}
+	//wf 2 lekcje w tygodniu
+	{
+		bool failure=1;
+		n=znajdz_nauczyciela(std::string("wf"), nauczyciele, wychowawcy);
+		if(n==nullptr)
+		{
+			wyczysc_sale(temp, sale);
+			out<<"Nie znaleziono wolnego nauczyciela wychowania fizycznego\n";
+			return;
+		}
+		los1=rand()%5;
+		los2=rand()%5;
+		while(los1==los2)
+		{
+			los2=rand()%5;
+		}
+		for(int i=0; i<5; i++)
+		{
+			if(i!=los1 && i!=los2) continue;
+			for(int j=0; j<9; j++)
+			{
+				if(temp.wskazZajecia(i,j)->wskazSale())
+				{
+					continue;
+				}
+				s=znajdz_sale(i, j, sale);
+				if(s)
+				{
+					failure=0;
+					zajecia pom(klas.zwrocSymbol());
+					pom.zmienSale(s);
+					s->zmienDostepnosc(i,j,1);
+					pom.zmienNauczyciela(n);
+					temp.zmienZajecia(i,j,&pom);
+					break;
+				}
+			}
+			if(failure)
+			{
+				wyczysc_sale(temp, sale);
+				out<<"Nie znaleziono wolnej sali\n";
+				return;
+			}
+		}
+	}
+	//informatyka 1 lekcja w tygodniu
+	{
+		bool failure=1;
+		n=znajdz_nauczyciela(std::string("informatyka"), nauczyciele, wychowawcy);
+		if(n==nullptr)
+		{
+			wyczysc_sale(temp, sale);
+			out<<"Nie znaleziono wolnego nauczyciela informatyki\n";
+			return;
+		}
+		los=rand()%5;
+		for(int i=0; i<5; i++)
+		{
+			if(i!=los) continue;
+			for(int j=0; j<9; j++)
+			{
+				if(temp.wskazZajecia(i,j)->wskazSale())
+				{
+					continue;
+				}
+				s=znajdz_sale(i, j, sale);
+				if(s)
+				{
+					failure=0;
+					zajecia pom(klas.zwrocSymbol());
+					pom.zmienSale(s);
+					s->zmienDostepnosc(i,j,1);
+					pom.zmienNauczyciela(n);
+					temp.zmienZajecia(i,j,&pom);
+					break;
+				}
+			}
+			if(failure)
+			{
+				wyczysc_sale(temp, sale);
+				out<<"Nie znaleziono wolnej sali\n";
+				return;
+			}
+		}
+	}
+	//religia 1 lekcja w tygodniu
+	{
+		bool failure=1;
+		n=znajdz_nauczyciela(std::string("religia"), nauczyciele, wychowawcy);
+		if(n==nullptr)
+		{
+			wyczysc_sale(temp, sale);
+			out<<"Nie znaleziono wolnego nauczyciela religii\n";
+			return;
+		}
+		los=rand()%5;
+		for(int i=0; i<5; i++)
+		{
+			if(i!=los) continue;
+			for(int j=0; j<9; j++)
+			{
+				if(temp.wskazZajecia(i,j)->wskazSale())
+				{
+					continue;
+				}
+				s=znajdz_sale(i, j, sale);
+				if(s)
+				{
+					failure=0;
+					zajecia pom(klas.zwrocSymbol());
+					pom.zmienSale(s);
+					s->zmienDostepnosc(i,j,1);
+					pom.zmienNauczyciela(n);
+					temp.zmienZajecia(i,j,&pom);
+					break;
+				}
+			}
+			if(failure)
+			{
+				wyczysc_sale(temp, sale);
+				out<<"Nie znaleziono wolnej sali\n";
+				return;
+			}
+		}
+	}
+	plany.push_back(temp);
+	klas.dodajPlan();
+	changes=1;
+	out<<"Pomyslnie dodano plan lekcji\n";
+}
+
 void submenu_plany(std::istream& in, std::ostream& out, klasa& klas, bool& changes, lista<planLekcji>& plany, lista<sala>& sale, lista<nauczyciel>& nauczyciele, lista<wychowawca>& wychowawcy)
 {
-	
+	int option=0;
+	while(true)
+	{
+		out<<"Zarzadzanie planem lekcji klasy "<<klas.zwrocSymbol()<<"\n";
+		out<<"Wprowadz: \n";
+		out<<"1 - aby utworzyc plan\n";
+		out<<"2 - aby usunac plan\n";
+		out<<"3 - aby wypisac plan\n";
+		out<<"0 - aby wrocic do poprzedniego menu\n";
+		if(in>>option) ;
+		else
+		{
+			out<<"Niezrozumiale polecenie, sprobuj ponownie\n";
+			continue;
+		}
+		switch(option)
+		{
+			case 0: return;
+			case 1:
+			{
+				utworz_plan(out, klas, changes, plany, sale, nauczyciele, wychowawcy);
+				break;
+			}
+			case 2:
+			{
+				if(klas.zwrocPlan()==0)
+				{
+					out<<"Ta klasa nie posiada planu lekcji\n";
+					break;
+				}
+				int terminy=0;
+				for(int j=1; j<=plany.length(); j++)
+				{
+					if(plany[j].zwrocKlase()==klas.zwrocSymbol())
+					{
+						for(int d=0; d<5; d++)
+						{
+							for(int g=0; g<9; g++)
+							{
+								if(plany[j].wskazZajecia(d,g)->wskazSale())
+								{
+									plany[j].wskazZajecia(d,g)->wskazSale()->zmienDostepnosc(d,g);
+									terminy++;
+								}
+							}
+						}
+						plany.pop_at(j);
+					}
+				}
+				klas.usunPlan();
+				out<<"Pomyslnie usunieto plan lekcji klasy "<<klas.zwrocSymbol()<<" spowodowalo to zwolnienie "<<terminy<<" terminow w salach\n";
+				break;
+			}
+			case 3:
+			{
+				if(klas.zwrocPlan())
+				{
+					for(int i=1; i<=plany.length(); i++)
+					{
+						if(klas.zwrocSymbol()==plany[i].zwrocKlase())
+						{
+							out<<plany[i];
+						}
+					}
+				}
+				else
+				{
+					out<<"Ta klasa nie posiada planu lekcji\n";
+				}
+				break;
+			}
+			default:
+			{
+				out<<"Niezrozumiale polecenie, sprobuj ponownie\n";
+			}
+		}
+	}
 }
 
 void submenu_klasy(std::istream& in, std::ostream& out, lista<klasa>& klasy, bool& changes, lista<uczen>& uczniowie,lista<nauczyciel>& nauczyciele, lista<wychowawca>& wychowawcy, lista<planLekcji>& plany, lista<sala>& sale)
@@ -418,7 +958,76 @@ void submenu_klasy(std::istream& in, std::ostream& out, lista<klasa>& klasy, boo
 			}
 			case 2:
 			{
-				//dodaj
+				std::string klas;
+				bool failure=1;
+				int terminy=0, ucz=0;
+				out<<"Wprowadz oznaczenie klasy\n";
+				if(in>>klas)
+				{
+					for(int i=1; i<=klasy.length(); i++)
+					{
+						if(klas==klasy[i].zwrocSymbol())
+						{
+							failure=0;
+							if(klasy[i].zwrocWychowawstwo())
+							{
+								for(int j=1; j<=wychowawcy.length(); j++)
+								{
+									if(wychowawcy[j].wskazKlase()==&klasy[i])
+									{
+										wychowawcy[j].zmienKlase();
+										break;
+									}
+								}
+							}
+							if(klasy[i].zwrocLiczbe()>0)
+							{
+								for(int j=1; j<=uczniowie.length(); j++)
+								{
+									if(uczniowie[j].wskazKlase()==&klasy[i])
+									{
+										uczniowie[j].zmienKlase();
+										ucz++;
+									}
+								}
+							}
+							if(klasy[i].zwrocPlan())
+							{
+								for(int j=1; j<=plany.length(); j++)
+								{
+									if(plany[j].zwrocKlase()==klas)
+									{
+										for(int d=0; d<5; d++)
+										{
+											for(int g=0; g<9; g++)
+											{
+												if(plany[j].wskazZajecia(d,g)->wskazSale())
+												{
+													plany[j].wskazZajecia(d,g)->wskazSale()->zmienDostepnosc(d,g);
+													terminy++;
+												}
+											}
+										}
+										plany.pop_at(j);
+									}
+								}
+							}
+							klasy.pop_at(i);
+							changes=1;
+							out<<"Pomyslne usunieto klase "<<klas<<" spowodowalo to wypisanie "<<ucz<<" uczniow z tej klasy oraz zwolnilo "<<terminy<<" terminow w salach\n";
+							break;
+						}
+					}
+					if(failure)
+					{
+						out<<"Nie znaleziono takiej klasy\n";
+					}
+				}
+				else
+				{
+					out<<"Niepoprawne oznaczenie klasy\n";
+				}
+				break;
 			}
 			case 3:
 			{
@@ -431,7 +1040,130 @@ void submenu_klasy(std::istream& in, std::ostream& out, lista<klasa>& klasy, boo
 			}
 			case 4:
 			{
-				//dodaj
+				std::string klas, imie, nazwisko;
+				bool failure1=1, failure2=1;
+				out<<"Wprowadz symbol klasy\n";
+				if(in>>klas)
+				{
+					for(int i=1; i<=klasy.length(); i++)
+					{
+						if(klas==klasy[i].zwrocSymbol())
+						{
+							failure1=0;
+							bool opt=0;
+							out<<"Wprowadz:\n1 - aby dodac wychowawce\n0 - aby usunac wychowawce\n";
+							if(in>>opt)
+							{
+								if(opt)
+								{
+									out<<"Wprowadz imie nowego wychowawcy\n";
+									if(in>>imie)
+									{
+										out<<"Wprowadz nazwisko nowego wychowawcy\n";
+										if(in>>nazwisko)
+										{
+											for(int j=1; j<=wychowawcy.length(); j++)
+											{
+												if(nazwisko==wychowawcy[j].zwrocNazwisko())
+												{
+													if(imie==wychowawcy[j].zwrocImie())
+													{
+														failure2=0;
+														if(klasy[i].zwrocWychowawstwo())
+														{
+															for(int x=1; x<=wychowawcy.length(); x++)
+															{
+																if(&klasy[i]==wychowawcy[x].wskazKlase())
+																{
+																	wychowawcy[x].zmienKlase();
+																	klasy[i].usunWychowawce();
+																	break;
+																}
+															}
+														}
+														wychowawcy[j].zmienKlase(&klasy[i]);
+														changes=1;
+														out<<"Pomyslnie zmieniono wychowawce\n";
+													}
+												}
+											}
+											if(failure2)
+											{
+												for(int j=1; j<=nauczyciele.length(); j++)
+												{
+													if(nazwisko==nauczyciele[j].zwrocNazwisko())
+													{
+														if(imie==nauczyciele[j].zwrocImie())
+														{
+															failure2=0;
+															if(klasy[i].zwrocWychowawstwo())
+															{
+																for(int x=1; x<=wychowawcy.length(); x++)
+																{
+																	if(&klasy[i]==wychowawcy[x].wskazKlase())
+																	{
+																		wychowawcy[x].zmienKlase();
+																		klasy[i].usunWychowawce();
+																		break;
+																	}
+																}
+															}
+															wychowawca nowy(nauczyciele[j]);
+															wychowawcy.push_back(nowy);
+															nauczyciele.pop_at(j);
+															wychowawcy[wychowawcy.length()].zmienKlase(&klasy[i]);
+															changes=1;
+															out<<"Pomyslnie zmieniono wychowawce\n";
+														}
+													}
+												}
+											}
+											if(failure2) out<<"Nie znalezionog takiego nauczyciela\n";
+										}
+										else
+										{
+											out<<"Niepoprawne nazwisko\n";
+										}
+									}
+									else
+									{
+										out<<"Niepoprawne imie\n";
+									}
+								}
+								else
+								{
+									if(klasy[i].zwrocWychowawstwo())
+									{
+										for(int j=1; j<=wychowawcy.length(); j++)
+										{
+											if(&klasy[i]==wychowawcy[j].wskazKlase())
+											{
+												wychowawcy[j].zmienKlase();
+												klasy[i].usunWychowawce();
+												break;
+											}
+										}
+									}
+									else
+									{
+										out<<"Ta klasa nie posiada wychowawcy\n";
+									}
+								}
+							}
+							else
+							{
+								out<<"Niepoprawne polecenie\n";
+							}
+							break;
+						}
+					}
+					if(failure1) out<<"Nie znaleziono takiej klasy\n";
+				}
+				else
+				{
+					out<<"Niepoprawne oznaczenie klasy\n";
+				}
+				break;
 			}
 			case 5:
 			{
@@ -449,7 +1181,7 @@ void submenu_klasy(std::istream& in, std::ostream& out, lista<klasa>& klasy, boo
 							{
 								for(int j=1; j<=wychowawcy.length(); j++)
 								{
-									if(wychowawcy[j].zwrocKlase()==pom)
+									if(wychowawcy[j].wskazKlase()==&klasy[i])
 									{
 										out<<"Wychowawca klasy "<<pom<<" jest "<<wychowawcy[j].zwrocImie()<<" "<<wychowawcy[j].zwrocNazwisko()<<"\n";
 										break;
@@ -477,7 +1209,102 @@ void submenu_klasy(std::istream& in, std::ostream& out, lista<klasa>& klasy, boo
 			}
 			case 6:
 			{
-				//dodaj
+				std::string klas, imie, nazwisko;
+				bool failure1=1, failure2=1;
+				out<<"Wprowadz symbol klasy\n";
+				if(in>>klas)
+				{
+					for(int i=1; i<=klasy.length(); i++)
+					{
+						if(klas==klasy[i].zwrocSymbol())
+						{
+							failure1=0;
+							bool opt=0;
+							out<<"Wprowadz:\n1 - aby dodac ucznia\n0 - aby usunac ucznia\n";
+							if(in>>opt)
+							{
+								out<<"Wprowadz imie ucznia\n";
+								if(in>>imie)
+								{
+									out<<"Wprowadz nazwisko ucznia\n";
+									if(in>>nazwisko)
+									{
+										for(int j=1; j<=uczniowie.length(); j++)
+										{
+											if(nazwisko==uczniowie[j].zwrocNazwisko())
+											{
+												if(imie==uczniowie[j].zwrocImie())
+												{
+													failure2=0;
+													if(opt)
+													{
+														if(&klasy[i]==uczniowie[j].wskazKlase())
+														{
+															out<<"Ten uczen juz nalezy do tej klasy\n";
+														}
+														else
+														{
+															try
+															{
+																uczniowie[j].zmienKlase(&klasy[i]);
+																changes=1;
+																out<<"Pomyslnie dodano ucznia do klasy\n";
+															}
+															catch(std::string kom)
+															{
+																out<<kom<<"\n";
+															}
+														}
+													}
+													else
+													{
+														if(&klasy[i]==uczniowie[j].wskazKlase())
+														{
+															uczniowie[j].zmienKlase();
+															changes=1;
+															out<<"Pomyslnie usunieto ucznia z kasy\n";
+														}
+														else
+														{
+															out<<"Ten uczen nie nalezy do tej klasy\n";
+														}
+													}
+													break;
+												}
+											}
+										}
+										if(failure2)
+										{
+											out<<"Nie znaleziono takiego ucznia";
+										}
+									}
+									else
+									{
+										out<<"Niepoprawne nazwisko\n";
+									}
+								}
+								else
+								{
+									out<<"Niepoprawne imie\n";
+								}
+							}
+							else
+							{
+								out<<"Niepoprawne polecenie\n";
+							}
+							break;
+						}
+					}
+					if(failure1)
+					{
+						out<<"Nie znaleziono takiej klasy\n";
+					}
+				}
+				else
+				{
+					out<<"Niepoprawne oznaczenie klasy\n";
+				}
+				break;
 			}
 			case 7:
 			{
@@ -493,10 +1320,10 @@ void submenu_klasy(std::istream& in, std::ostream& out, lista<klasa>& klasy, boo
 							failure=0;
 							if(klasy[i].zwrocLiczbe())
 							{
-								out<<"Klasa "<<pom<<"sklada sie z "<<klasy[i].zwrocLiczbe()<<" uczniow:\n";
+								out<<"Klasa "<<pom<<" sklada sie z "<<klasy[i].zwrocLiczbe()<<" uczniow:\n";
 								for(int j=1; j<=uczniowie.length(); j++)
 								{
-									if(uczniowie[j].zwrocKlase()==pom)
+									if(uczniowie[j].wskazKlase()==&klasy[i])
 									{
 										out<<uczniowie[j].zwrocImie()<<" "<<uczniowie[j].zwrocNazwisko()<<"\n";
 									}
@@ -523,7 +1350,30 @@ void submenu_klasy(std::istream& in, std::ostream& out, lista<klasa>& klasy, boo
 			}
 			case 8:
 			{
-				//dodaj
+				std::string pom;
+				bool failure=1;
+				out<<"Wprowadz symbol klasy\n";
+				if(in>>pom)
+				{
+					for(int i=1; i<=klasy.length(); i++)
+					{
+						if(pom==klasy[i].zwrocSymbol())
+						{
+							failure=0;
+							submenu_plany(in, out, klasy[i], changes, plany, sale, nauczyciele, wychowawcy);
+							break;
+						}
+					}
+					if(failure)
+					{
+						out<<"Nie znaleziono takiej klasy\n";
+					}
+				}
+				else
+				{
+					out<<"Niepoprawne oznaczenie klasy\n";
+				}
+				break;
 			}
 			default:
 			{
@@ -599,7 +1449,10 @@ void submenu_uczniowie(std::istream& in, std::ostream& out, lista<uczen>& ucznio
 								if(imie==uczniowie[i].zwrocImie())
 								{
 									failure=0;
-									uczniowie[i].wskazKlase()->usunUcznia();
+									if(uczniowie[i].wskazKlase())
+									{
+										uczniowie[i].wskazKlase()->usunUcznia();
+									}
 									uczniowie.pop_at(i);
 									changes=1;
 									out<<"Pomyslnie usunieto ucznia\n";
@@ -663,7 +1516,9 @@ void submenu_uczniowie(std::istream& in, std::ostream& out, lista<uczen>& ucznio
 														failure2=0;
 														try
 														{
-															klasy[j].dodajUcznia();
+															uczniowie[i].zmienKlase(&klasy[j]);
+															changes=1;
+															out<<"Pomyslnie przypisano ucznia do klasy\n";
 														}
 														catch(std::string obj)
 														{
@@ -675,9 +1530,6 @@ void submenu_uczniowie(std::istream& in, std::ostream& out, lista<uczen>& ucznio
 															out<<"Cos poszlo nie tak\n";
 															break;
 														}
-														uczniowie[i].zmienKlase(&klasy[j]);
-														changes=1;
-														out<<"Pomyslnie przypisano ucznia do klasy\n";
 														break;
 													}
 												}
@@ -690,7 +1542,6 @@ void submenu_uczniowie(std::istream& in, std::ostream& out, lista<uczen>& ucznio
 										}
 										else
 										{
-											uczniowie[i].wskazKlase()->usunUcznia();
 											uczniowie[i].zmienKlase();
 											out<<"Pomyslnie wypisano ucznia z klasy\n";
 											changes=1;
@@ -737,8 +1588,8 @@ void submenu_pracownicy(std::istream& in, std::ostream& out, lista<pracownik>& p
 		out<<"1 - aby dodac pracownika\n";
 		out<<"2 - aby usunac pracownika\n";
 		out<<"3 - aby wypisac pracownikow\n";
-		out<<"4 - aby zmienic pensje pracownika\n";
-		out<<"5 - aby zmienic stanowisko pracownika\n";
+		out<<"4 - aby zmienic stanowisko pracownika\n";
+		out<<"5 - aby zmienic pensje pracownika\n";
 		out<<"0 - aby wrocic do poprzedniego menu\n";
 		if(in>>option) ;
 		else
@@ -963,7 +1814,7 @@ void submenu_pracownicy(std::istream& in, std::ostream& out, lista<pracownik>& p
 	}
 }
 
-void submenu_nauczyciele(std::istream& in, std::ostream& out, lista<nauczyciel>& nauczyciele, bool& changes, lista<klasa>& klasy, lista<wychowawca>& wychowawcy)
+void submenu_nauczyciele(std::istream& in, std::ostream& out, lista<nauczyciel>& nauczyciele, bool& changes, lista<klasa>& klasy, lista<wychowawca>& wychowawcy, lista<planLekcji>& plany)
 {
 	int option=0;
 	while(true)
@@ -1024,6 +1875,7 @@ void submenu_nauczyciele(std::istream& in, std::ostream& out, lista<nauczyciel>&
 			{
 				std::string imie, nazwisko;
 				bool failure=1;
+				int ilosc=0;
 				out<<"Wprowadz imie nauczyciela\n";
 				if(in>>imie)
 				{
@@ -1037,9 +1889,23 @@ void submenu_nauczyciele(std::istream& in, std::ostream& out, lista<nauczyciel>&
 								if(imie==nauczyciele[i].zwrocImie())
 								{
 									failure=0;
+									for(int j=1; j<=plany.length(); j++)
+									{
+										for(int x=0; x<5; x++)
+										{
+											for(int y=0; y<9; y++)
+											{
+												if(plany[j].wskazZajecia(x,y)->wskazNauczyciela()==&(nauczyciele[i]))
+												{
+													plany[j].zmienZajecia(x,y);
+													ilosc++;
+												}
+											}
+										}
+									}
 									nauczyciele.pop_at(i);
 									changes=1;
-									out<<"Pomyslnie usunieto nauczyciela\n";
+									out<<"Pomyslnie usunieto nauczyciela, spowodowalo to usuniecie "<<ilosc<<" zajec przez niego prowadzonych\n";
 									break;
 								}
 							}
@@ -1053,10 +1919,27 @@ void submenu_nauczyciele(std::istream& in, std::ostream& out, lista<nauczyciel>&
 									if(imie==wychowawcy[i].zwrocImie())
 									{
 										failure=0;
-										wychowawcy[i].wskazKlase()->usunWychowawce();
+										for(int j=1; j<=plany.length(); j++)
+										{
+											for(int x=0; x<5; x++)
+											{
+												for(int y=0; y<9; y++)
+												{
+													if(plany[j].wskazZajecia(x,y)->wskazNauczyciela()==&(wychowawcy[i]))
+													{
+														plany[j].zmienZajecia(x,y);
+														ilosc++;
+													}
+												}
+											}
+										}
+										if(wychowawcy[i].wskazKlase())
+										{
+											wychowawcy[i].wskazKlase()->usunWychowawce();
+										}
 										wychowawcy.pop_at(i);
 										changes=1;
-										out<<"Pomyslnie usunieto nauczyciela\n";
+										out<<"Pomyslnie usunieto nauczyciela, spowodowalo to usuniecie "<<ilosc<<" zajec przez niego prowadzonych\n";
 										break;
 									}
 								}
@@ -1202,6 +2085,7 @@ void submenu_nauczyciele(std::istream& in, std::ostream& out, lista<nauczyciel>&
 
 void MENU(std::istream& in, std::ostream& out, lista<klasa>& klasy, lista<sala>& sale, lista<uczen>& uczniowie, lista<pracownik>& pracownicy, lista<nauczyciel>& nauczyciele, lista<wychowawca>& wychowawcy, lista<planLekcji>& plany)
 {
+	srand(time(NULL));
 	int option=0;
 	bool changes=0;
 	std::string nazwaPliku;
@@ -1216,6 +2100,7 @@ void MENU(std::istream& in, std::ostream& out, lista<klasa>& klasy, lista<sala>&
 		out<<"5 - aby edytowac dane o pracownikach\n";
 		out<<"6 - aby edytowac dane o nauczycielach\n";
 		out<<"7 - aby edytowac dane o uczniach\n";
+		out<<"8 - aby policzyć koszt pensji pracownikow i nauczycieli\n";
 		out<<"0 - aby zakonczyc dzialanie programu\n";
 		if(in>>option) ;
 		else 
@@ -1256,6 +2141,7 @@ void MENU(std::istream& in, std::ostream& out, lista<klasa>& klasy, lista<sala>&
 				{
 					try {
 						loading(nazwaPliku, klasy, sale, uczniowie, pracownicy, nauczyciele, wychowawcy, plany);
+						out<<"Pomyslnie wczytano plik\n";
 					}
 					catch (...)
 					{
@@ -1338,7 +2224,7 @@ void MENU(std::istream& in, std::ostream& out, lista<klasa>& klasy, lista<sala>&
 			}
 			case 4:
 			{
-				//dodaj
+				submenu_klasy(in, out, klasy, changes, uczniowie, nauczyciele, wychowawcy, plany, sale);
 				break;
 			}
 			case 5:
@@ -1348,12 +2234,30 @@ void MENU(std::istream& in, std::ostream& out, lista<klasa>& klasy, lista<sala>&
 			}
 			case 6:
 			{
-				submenu_nauczyciele(in, out, nauczyciele, changes, klasy, wychowawcy);
+				submenu_nauczyciele(in, out, nauczyciele, changes, klasy, wychowawcy, plany);
 				break;
 			}
 			case 7:
 			{
 				submenu_uczniowie(in, out, uczniowie, changes, klasy);
+				break;
+			}
+			case 8:
+			{
+				double prac=0, naucz=0;
+				for(int i=1; i<=pracownicy.length(); i++)
+				{
+					prac+=pracownicy[i].zwrocPensje();
+				}
+				for(int i=1; i<=nauczyciele.length(); i++)
+				{
+					naucz+=nauczyciele[i].zwrocPensje();
+				}
+				for(int i=1; i<=wychowawcy.length(); i++)
+				{
+					naucz+=wychowawcy[i].zwrocPensje();
+				}
+				out<<"Pensje pracownikow wynosza "<<prac<<" zl, a nauczycieli "<<naucz<<" zl\n";
 				break;
 			}
 			default:
