@@ -441,6 +441,11 @@ void wyczysc_sale(planLekcji& plan, lista<sala>& sale)
 
 void utworz_plan(std::ostream& out, klasa& klas, bool& changes, lista<planLekcji>& plany, lista<sala>& sale, lista<nauczyciel>& nauczyciele, lista<wychowawca>& wychowawcy)
 {
+	if(klas.zwrocPlan())
+	{
+		out<<"Ta klasa posiada już plan lekcji\n";
+		return;
+	}
 	planLekcji temp(&klas);
 	int los, los1, los2;
 	nauczyciel* n;
